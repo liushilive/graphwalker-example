@@ -5,8 +5,9 @@ import com.company.VeterinariensSharedState;
 import com.company.helper.Helper;
 import org.graphwalker.core.machine.ExecutionContext;
 import org.graphwalker.java.annotation.GraphWalker;
-import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Implements the model (and interface) VeterinariensSharedState
@@ -18,19 +19,20 @@ public class Veterinariens extends ExecutionContext implements VeterinariensShar
 
     @Override
     public void e_Search() {
-        Helper.WaitForElement(By.cssSelector("input[type=\"search\"]")).clear();
-        Helper.WaitForElement(By.cssSelector("input[type=\"search\"]")).sendKeys("helen");
-
+        Helper.getWaiter().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"search\"]"))).clear();
+        Helper.getWaiter().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"search\"]"))).sendKeys("helen");
     }
 
     @Override
     public void v_SearchResult() {
-        String bodyText = Helper.WaitForElement(By.xpath("//table[@id='vets']/tbody/tr/td")).getText();
-        Assert.assertTrue("Text not found!", bodyText.contains("Helen Leary"));
+        Helper.getWaiter().until(ExpectedConditions.textToBe(By.xpath("//table[@id='vets']/tbody/tr/td"), "Helen Leary"));
+        Helper.getWaiter().until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/table[last()]/tbody/tr/td[2]/img")));
     }
 
     @Override
     public void v_Veterinarians() {
-        Assert.assertTrue(Helper.WaitForElement(By.tagName("h2")).getText().matches("Veterinarians"));
+        Helper.getWaiter().until(ExpectedConditions.textToBe(By.tagName("h2"), "Veterinarians"));
+        WebElement table = Helper.getWaiter().until(ExpectedConditions.visibilityOfElementLocated(By.id("vets")));
+        org.junit.Assert.assertTrue(table.findElements(By.xpath("id('vets')/tbody/tr")).size() >= 1);
     }
 }
